@@ -1,23 +1,39 @@
-# CLI File Manager
+# CLI + GUI File Manager
 
-Command-line file manager.
+File manager with CLI and GUI interfaces.
 
-## Commands
+## Installation
 
-### Copy file
+pip install -r requirements.txt
+
+---
+
+# CLI MODE
+
 python run.py copy file.txt
 
-### Delete file/folder
-python run.py delete folder_name
+python run.py delete folder
 
-### Count files
-python run.py count folder_name
+python run.py count folder
 
-### Find files
-python run.py find folder_name --pattern ".*\.py"
+python run.py find folder --pattern ".*\.py"
 
-### Add creation date
-python run.py add-date folder_name --recursive
+python run.py add-date folder --recursive
 
-### Analyse folder
-python run.py analyse folder_name
+python run.py analyse folder
+
+---
+
+# GUI MODE
+
+python run.py gui
+
+Graphical interface allows:
+
+
+The graphical interface allows you to:
+
+- Selecting actions for working with files
+- Selecting files or folders using the built-in picker
+- Using regex search
+- Viewing operation results (both successful and error messages)
