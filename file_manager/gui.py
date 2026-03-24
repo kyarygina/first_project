@@ -1,10 +1,12 @@
 import flet as ft
+import config
 from file_manager import actions
+
 
 def main(page: ft.Page):
     page.title = "File Manager GUI"
-    page.window_width = 800
-    page.window_height = 600
+    page.window_width = config.WINDOW_WIDTH
+    page.window_height = config.WINDOW_HEIGHT
     page.scroll = "auto"
 
     selected_path = {"value": None}
@@ -26,12 +28,12 @@ def main(page: ft.Page):
     action_dropdown = ft.Dropdown(
         label="Select action",
         options=[
-            ft.dropdown.Option("copy file"),
-            ft.dropdown.Option("delete path"),
-            ft.dropdown.Option("count files"),
-            ft.dropdown.Option("find files"),
-            ft.dropdown.Option("add creation date"),
-            ft.dropdown.Option("analyse folder"),
+            ft.dropdown.Option(config.Action.COPY_FILE.value),
+            ft.dropdown.Option(config.Action.DELETE_PATH.value),
+            ft.dropdown.Option(config.Action.COUNT_FILES.value),
+            ft.dropdown.Option(config.Action.FIND_FILES.value),
+            ft.dropdown.Option(config.Action.ADD_CREATION_DATE.value),
+            ft.dropdown.Option(config.Action.ANALYSE_FOLDER.value),
         ],
         width=300,
     )
@@ -71,36 +73,37 @@ def main(page: ft.Page):
 
     # ---------- ACTION HANDLER ----------
     def handle_execute(e):
-        action = action_dropdown.value
         try:
-            if not action:
+            if not action_dropdown.value:
                 show_message("Please select an action.", "red")
                 return
 
+            action = config.Action(action_dropdown.value)
+
             path = selected_path["value"]
 
-            if action == "copy file":
+            if action == config.Action.COPY_FILE:
                 if not path:
                     show_message("Please select a file to copy.", "red")
                     return
                 new_path = actions.copy_file(path)
                 show_message(f"Copied to: {new_path}", "green")
 
-            elif action == "delete path":
+            elif action == config.Action.DELETE_PATH:
                 if not path:
                     show_message("Please select a file or folder to delete.", "red")
                     return
                 actions.delete_path(path)
                 show_message("Deleted successfully", "green")
 
-            elif action == "count files":
+            elif action == config.Action.COUNT_FILES:
                 if not path:
                     show_message("Please select a folder.", "red")
                     return
                 total = actions.count_files(path)
                 show_message(f"Total files: {total}", "green")
 
-            elif action == "find files":
+            elif action == config.Action.FIND_FILES:
                 if not path:
                     show_message("Please select a folder to search in.", "red")
                     return
@@ -111,14 +114,14 @@ def main(page: ft.Page):
                 files = actions.find_files(path, pattern)
                 show_message("\n".join(files) if files else "No matches found", "blue")
 
-            elif action == "add creation date":
+            elif action == config.Action.ADD_CREATION_DATE:
                 if not path:
                     show_message("Please select a file or folder.", "red")
                     return
                 renamed = actions.add_creation_date(path, recursive_checkbox.value)
                 show_message("Renamed:\n" + "\n".join(renamed), "green")
 
-            elif action == "analyse folder":
+            elif action == config.Action.ANALYSE_FOLDER:
                 if not path:
                     show_message("Please select a folder.", "red")
                     return
@@ -140,8 +143,13 @@ def main(page: ft.Page):
         input_container.controls.clear()
         clear_inputs()
 
-        action = action_dropdown.value
-        if action == "copy file":
+        if not action_dropdown.value:
+            page.update()
+            return
+
+        action = config.Action(action_dropdown.value)
+
+        if action == config.Action.COPY_FILE:
             input_container.controls.append(
                 ft.ElevatedButton(
                     "Select File",
@@ -152,7 +160,7 @@ def main(page: ft.Page):
             input_container.controls.append(path_display)
             input_container.controls.append(execute_button)
 
-        elif action == "delete path":
+        elif action == config.Action.DELETE_PATH:
             input_container.controls.append(
                 ft.Row([
                     ft.ElevatedButton(
@@ -170,7 +178,7 @@ def main(page: ft.Page):
             input_container.controls.append(path_display)
             input_container.controls.append(execute_button)
 
-        elif action == "count files":
+        elif action == config.Action.COUNT_FILES:
             input_container.controls.append(
                 ft.ElevatedButton(
                     "Select Folder",
@@ -181,7 +189,7 @@ def main(page: ft.Page):
             input_container.controls.append(path_display)
             input_container.controls.append(execute_button)
 
-        elif action == "find files":
+        elif action == config.Action.FIND_FILES:
             input_container.controls.append(
                 ft.ElevatedButton(
                     "Select Folder",
@@ -193,7 +201,7 @@ def main(page: ft.Page):
             input_container.controls.append(pattern_input)
             input_container.controls.append(execute_button)
 
-        elif action == "add creation date":
+        elif action == config.Action.ADD_CREATION_DATE:
             input_container.controls.append(
                 ft.Row([
                     ft.ElevatedButton(
@@ -212,7 +220,7 @@ def main(page: ft.Page):
             input_container.controls.append(recursive_checkbox)
             input_container.controls.append(execute_button)
 
-        elif action == "analyse folder":
+        elif action == config.Action.ANALYSE_FOLDER:
             input_container.controls.append(
                 ft.ElevatedButton(
                     "Select Folder",
@@ -236,6 +244,7 @@ def main(page: ft.Page):
         ft.Text("Result:", weight="bold"),
         result_text
     )
+
 
 def run_gui():
     ft.app(target=main)
